@@ -14,7 +14,7 @@ def test_defaults():
     assert t1 == t2
 
 
-# @pytest.mark.run_these_please
+@pytest.mark.run_these_please
 def test_member_access():
     """Check .field functionality of namedtuple."""
     t = Task('buy milk', 'brian')
