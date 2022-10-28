@@ -86,11 +86,14 @@ def test_add_5(task):
 
 
 @pytest.mark.parametrize(
-    'task', 
+    'task',
     [
         pytest.param(Task('create'), id='just summary'),
         pytest.param(Task('inspire', 'Michelle'), id='summary/owner'),
-        pytest.param(Task('encourage', 'Michelle', True), id='summary/owner/done')
+        pytest.param(
+            Task('encourage', 'Michelle', True),
+            id='summary/owner/done'
+        )
     ]
 )
 def test_add_6(task):
@@ -103,6 +106,7 @@ def test_add_6(task):
 @pytest.mark.parametrize('task', tasks_to_try, ids=task_ids)
 class TestAdd():
     """Demonstrate parametrize and test classes."""
+
     def test_equivalent(self, task):
         """Similar test, just within a class."""
         task_id = tasks.add(task)
