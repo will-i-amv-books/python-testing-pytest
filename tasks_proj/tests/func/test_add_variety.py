@@ -7,7 +7,6 @@ from tasks import Task
 tasks_to_try = (
     Task('sleep', done=True),
     Task('wake', 'brian'),
-    Task('wake', 'brian'),
     Task('breathe', 'BRIAN', True),
     Task('exercise', 'BrIaN', False)
 )
@@ -27,7 +26,7 @@ def equivalent(t1, t2):
     )
 
 
-def test_add_1():
+def test_add_1(tasks_db):
     """tasks.get() using id returned from add() works."""
     task = Task('breathe', 'BRIAN', True)
     task_id = tasks.add(task)
@@ -45,7 +44,7 @@ def test_add_1():
         Task('exercise', 'BrIaN', False)
     ]
 )
-def test_add_2(task):
+def test_add_2(tasks_db, task):
     """Demonstrate parametrize with one parameter."""
     task_id = tasks.add(task)
     t_from_db = tasks.get(task_id)
@@ -61,7 +60,7 @@ def test_add_2(task):
         ('eat eggs', 'BrIaN', False),
     ]
 )
-def test_add_3(summary, owner, done):
+def test_add_3(tasks_db, summary, owner, done):
     """Demonstrate parametrize with multiple parameters."""
     task = Task(summary, owner, done)
     task_id = tasks.add(task)
@@ -70,7 +69,7 @@ def test_add_3(summary, owner, done):
 
 
 @pytest.mark.parametrize('task', tasks_to_try)
-def test_add_4(task):
+def test_add_4(tasks_db, task):
     """Slightly different take."""
     task_id = tasks.add(task)
     t_from_db = tasks.get(task_id)
@@ -78,7 +77,7 @@ def test_add_4(task):
 
 
 @pytest.mark.parametrize('task', tasks_to_try, ids=task_ids)
-def test_add_5(task):
+def test_add_5(tasks_db, task):
     """Demonstrate ids."""
     task_id = tasks.add(task)
     t_from_db = tasks.get(task_id)
@@ -96,7 +95,7 @@ def test_add_5(task):
         )
     ]
 )
-def test_add_6(task):
+def test_add_6(task, tasks_db):
     """Demonstrate pytest.param and id."""
     task_id = tasks.add(task)
     t_from_db = tasks.get(task_id)
@@ -107,22 +106,14 @@ def test_add_6(task):
 class TestAdd():
     """Demonstrate parametrize and test classes."""
 
-    def test_equivalent(self, task):
+    def test_equivalent(self, tasks_db, task):
         """Similar test, just within a class."""
         task_id = tasks.add(task)
         t_from_db = tasks.get(task_id)
         assert equivalent(t_from_db, task)
 
-    def test_valid_id(self, task):
+    def test_valid_id(self, tasks_db, task):
         """We can use the same data for multiple tests."""
         task_id = tasks.add(task)
         t_from_db = tasks.get(task_id)
         assert t_from_db.id == task_id
-
-
-@pytest.fixture(autouse=True)
-def initialized_tasks_db(tmpdir):
-    """Connect to db before testing, disconnect after."""
-    tasks.start_tasks_db(str(tmpdir), 'tiny')
-    yield
-    tasks.stop_tasks_db()

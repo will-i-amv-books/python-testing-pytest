@@ -4,7 +4,7 @@ import tasks
 from tasks import Task
 
 
-def test_add_returns_valid_id():
+def test_add_returns_valid_id(tasks_db):
     """tasks.add(<valid task>) should return an integer."""
     # GIVEN an initialized tasks db
     # WHEN a new task is added
@@ -15,7 +15,7 @@ def test_add_returns_valid_id():
 
 
 @pytest.mark.smoke
-def test_added_task_has_id_set():
+def test_added_task_has_id_set(tasks_db):
     """Make sure the task_id field is set by tasks.add()."""
     # GIVEN an initialized tasks db
     #   AND a new task is added
@@ -28,14 +28,16 @@ def test_added_task_has_id_set():
     # THEN task_id matches id field
     assert task_from_db.id == task_id
 
+    # AND contents are equivalent (except for id)
+    # the [:-1] syntax returns a list with all but the last element
+    assert task_from_db[:-1] == new_task[:-1]
 
-@pytest.fixture(autouse=True)
-def initialized_tasks_db(tmpdir):
-    """Connect to db before testing, disconnect after."""
-    # Setup : start db
-    tasks.start_tasks_db(str(tmpdir), 'tiny')
 
-    yield  # this is where the testing happens
+def test_add_increases_count(db_with_3_tasks):
+    """Test tasks.add() affect on tasks.count()."""
+    # GIVEN a db with 3 tasks
+    #  WHEN another task is added
+    tasks.add(Task('throw a party'))
 
-    # Teardown : stop db
-    tasks.stop_tasks_db()
+    #  THEN the count increases by 1
+    assert tasks.count() == 4
