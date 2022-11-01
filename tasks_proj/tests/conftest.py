@@ -4,12 +4,12 @@ import tasks
 from tasks import Task
 
 
-@pytest.fixture(scope='session')
-def tasks_db_session(tmpdir_factory):
+@pytest.fixture(scope='session', params=['tiny', 'mongo'])
+def tasks_db_session(tmpdir_factory, request):
     """Connect to db before tests, disconnect after."""
     temp_dir = tmpdir_factory.mktemp('temp')
-    tasks.start_tasks_db(str(temp_dir), 'tiny')
-    yield
+    tasks.start_tasks_db(str(temp_dir), request.param)
+    yield  # this is where the testing happens
     tasks.stop_tasks_db()
 
 
@@ -21,9 +21,8 @@ def tasks_db(tasks_db_session):
 
 # Reminder of Task constructor interface
 # Task(summary=None, owner=None, done=False, id=None)
-# summary is required
+# Don't set id, it's set by database
 # owner and done are optional
-# id is set by database
 
 
 @pytest.fixture(scope='session')
